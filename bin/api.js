@@ -4,10 +4,9 @@ const gulp = require('gulp');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
 const rp = require('request-promise');
-const log = console.log;
-const { apiConfig } = require(path.resolve(process.cwd(), './nei.config'));
+const log = require("./log.js");
 const util = require("./util");
-
+const apiConfig = require(path.resolve(process.cwd(), './nei.config'))
 // api列表索引
 let apisIndex = 0;
 // api列表
@@ -16,20 +15,8 @@ let apisArr = [];
 let buildPath = '';
 // api数据
 let apiDatas = {};
-// 是否覆盖
-let isOverride = false;
 
 let api = {};
-
-/**
- * 生成适用于微信的api接口
- * @param {String} dir 创建目录
- * @param {Object} data api数据
- * @param {Boolean} override 是否重新生成，会先清空原来生成的文件
- */
-api.buildADMIN = (dir, data, override) => {
-  api.build(dir, data, override);
-};
 
 
 /**
@@ -39,11 +26,11 @@ api.buildADMIN = (dir, data, override) => {
  * @param {Boolean} override 是否重新生成，会先清空原来生成的文件
  */
 api.build = (dir, data, override) => {
-  //   let { ...newData } = data.result;
-  //   apiDatas = data; // 缓存到全局
-  isOverride = override;
+  if (!fs.existsSync(dir)) {
+    log.error("api创建目录不存在，请确认配置的目录地址是否存在")
+    return
+  }
   buildPath = dir;
-
   // 如果覆盖，先清除源目录
   if (override) {
     api.clean(dir);
@@ -57,7 +44,7 @@ api.build = (dir, data, override) => {
  * @param {Object} data 指定的一个api数据
  */
 api.buildOne = function (data) {
-  log(data);
+  log.info(data);
   let urlArr = util.cleanEmptyInArray(data.path.split('/'));
   let apiPath = buildPath;
 
@@ -128,6 +115,10 @@ api.buildOne = function (data) {
   let targetApiFilePath = `${apiPath}${apiFileName}`;
   // 模板文件路径
   let tplApiFilePath = apiConfig.TPL_API_PATH;
+  if (!fs.existsSync(tplApiFilePath)) {
+    log.error("无法找到api模板，请确认配置的路径是否正确")
+    return
+  }
   // 如果目标文件已存在 并且不要覆盖
   if (fs.existsSync(targetApiFilePath)) {
     // 读取目标文件内容
@@ -137,7 +128,7 @@ api.buildOne = function (data) {
     let matchText = '';
     matchText = `export = function ${API_NAME}(data) {`;
     if (targetFileContent.indexOf(matchText) >= 0) {
-      // log("这个api已存在...下一个")
+      // log.info("这个api已存在...下一个")
       api.buildNext();
       return;
     }
@@ -152,23 +143,23 @@ api.buildOne = function (data) {
       .replace(/__data__/, API_DATA)
       .replace(/__headers__/g, API_HEADERS);
 
-    log('api名称: ' + API_NAME);
-    log('api描述: ' + API_dESCRIBE);
-    log('api地址: ' + API_URL);
+    log.info('api名称: ' + API_NAME);
+    log.info('api描述: ' + API_dESCRIBE);
+    log.info('api地址: ' + API_URL);
 
     // 写入新内容
     try {
-      log(targetApiFilePath)
+      log.info(targetApiFilePath)
       fs.writeFileSync(targetApiFilePath, `${targetFileContent}\n${newTplFileContent}`, 'utf8');
-      log(`api ${API_NAME} 创建成功`);
+      log.success(`api ${API_NAME} 创建成功`);
     } catch (error) {
-      log(`api ${API_NAME} 创建失败，原因：${error}`);
+      log.error(`api ${API_NAME} 创建失败，原因：${error}`);
     }
     api.buildNext();
   } else {
-    log(targetApiFilePath);
-    log(apiFileName);
-    log(apiPath);
+    log.info(targetApiFilePath);
+    log.info(apiFileName);
+    log.info(apiPath);
     // 如果目标文件不存在， 创建目标文件
     gulp
       .src(tplApiFilePath)
@@ -188,7 +179,7 @@ api.buildOne = function (data) {
           `import request from '@/utils/request/request';\n${targetFileContent}`,
           'utf8',
         );
-        log(`api ${API_NAME} 创建成功`);
+        log.success(`api ${API_NAME} 创建成功`);
         api.buildNext();
       });
   }
@@ -202,7 +193,7 @@ api.buildNext = function () {
   if (apisArr[apisIndex]) {
     api.buildOne(apisArr[apisIndex]);
   } else {
-    log('api创建结束');
+    log.info('api创建结束');
   }
 };
 
@@ -234,7 +225,7 @@ api.getApiJson = async function () {
     if (fs.existsSync(API_FILE_PATH)) {
       apiJson = require(API_FILE_PATH);
     } else {
-      log('api.json文件不存在');
+      log.error('api.json文件不存在');
     }
   }
   if (TYPE === 2) {
@@ -243,9 +234,17 @@ api.getApiJson = async function () {
       uri: `${NEI_SERVER}/openapi/interfaces?pid=${NEI_PID}&private_token=${PRIVATE_TOKEN}`,
       json: true
     };
-    apiJson = await rp(options);
+    try {
+      apiJson = await rp(options);
+      if (apiJson.code !== 200) {
+        log.error(`接口请求失败：${apiJson.msg}`)
+        return;
+      }
+    } catch (err) {
+      log.error(`接口请求失败：${err}`)
+    }
   }
-  api.buildADMIN(apiConfig.API_DIR_PATH, apiJson, true);
+  api.build(apiConfig.API_DIR_PATH, apiJson, true);
 }
 module.exports.api = api;
 

@@ -21,6 +21,7 @@
   },
   "scripts": {},
   "dependencies": {
+    "chalk": "^4.1.1",
     "commander": "^7.2.0",
     "gulp": "^4.0.2",
     "gulp-rename": "^2.0.0",

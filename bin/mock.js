@@ -1,9 +1,9 @@
 const fs = require('fs');
 const rp = require('request-promise');
 const path = require('path');
-const { apiConfig } = require(path.resolve(process.cwd(), './nei.config'));
 const util = require("./util");
-const log = console.log;
+const log = require("./log.js");
+const apiConfig = require(path.resolve(process.cwd(), './nei.config'))
 let mock = {};
 // mock列表索引
 let mockIndex = 0;
@@ -35,7 +35,7 @@ mock.getMockData = async (url) => {
         const mockData = await rp(options);
         return mockData;
     } catch (err) {
-        log(`接口${url}请求失败：${err}`)
+        log.error(`接口${url}请求失败：${err}`)
         return {}
     }
 }
@@ -82,11 +82,11 @@ mock.buildOne = async function (data) {
     }
     // 写入新内容
     try {
-        log(targetMockFilePath)
+        log.info(targetMockFilePath)
         fs.writeFileSync(targetMockFilePath, JSON.stringify(mockData), 'utf8');
-        log(`mock ${API_NAME} 创建成功`);
+        log.success(`mock ${API_NAME} 创建成功`);
     } catch (error) {
-        log(`mock ${API_NAME} 创建失败，原因：${error}`);
+        log.error(`mock ${API_NAME} 创建失败，原因：${error}`);
     }
     mock.buildNext();
 };
@@ -98,7 +98,7 @@ mock.buildNext = function () {
     if (mockArr[mockIndex]) {
         mock.buildOne(mockArr[mockIndex]);
     } else {
-        log('mock创建结束');
+        log.info('mock创建结束');
     }
 };
 /**
@@ -111,7 +111,7 @@ mock.getMock = async function () {
         if (fs.existsSync(API_FILE_PATH)) {
             apiJson = require(API_FILE_PATH);
         } else {
-            log('api.json文件不存在');
+            log.error('api.json文件不存在');
         }
     }
     if (TYPE === 2) {
@@ -123,7 +123,7 @@ mock.getMock = async function () {
         try {
             apiJson = await rp(options);
         } catch (err) {
-            log(`接口请求失败：${err}`)
+            log.error(`接口请求失败：${err}`)
         }
     }
     mock.build(apiConfig.MOCK_DIR_PATH, apiJson, true);
