@@ -1,0 +1,8 @@
+/node_modules
+/yarn.lock
+/dist
+/mock
+/src/services/*
+package-lock.json
+.DS_Store
+coverage
