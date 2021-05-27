@@ -53,12 +53,17 @@ api.buildOne = function (data) {
   }
 
   let API_NAME = urlArr[urlArr.length - 1];
+  
   if (API_NAME === 'delete') {
     // delete不能作为函数方法名
     API_NAME = 'delete_1';
   }
   const API_dESCRIBE = data.name || '';
-  const API_URL = `"${urlArr.join('/')}"`;
+  let API_URL = `"${urlArr.join('/')}"`;
+  if (API_NAME.includes('{')) {
+    API_NAME = API_NAME.replace('{', '').replace('}', '')
+    API_URL = API_URL.replace(/"/g, '`').replace(/{/g, '${params.')
+  }
   const API_METHOD = data.method.toLowerCase();
   let API_DATA = 'data';
   // headers 处理

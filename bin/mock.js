@@ -28,7 +28,8 @@ mock.getMockData = async (url) => {
     const newUrl = `${apiConfig.NEI_SERVER}/api/apimock-v2/${apiConfig.PROJECT_KEY}/${url}`;
     var options = {
         method: 'POST',
-        uri: newUrl,
+        url: newUrl,
+        timeout: 2000,
         json: true
     };
     try {

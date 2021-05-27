@@ -1,6 +1,6 @@
 {
   "name": "nei-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Creates a rnpx application using the command line.",
   "homepage": "https://github.com/AllenPan03/nei-api",
   "bugs": {
