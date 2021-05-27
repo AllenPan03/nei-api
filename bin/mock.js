@@ -4,6 +4,8 @@ const path = require('path');
 const util = require("./util");
 const log = require("./log.js");
 const apiConfig = require(path.resolve(process.cwd(), './nei.config'))
+const MOCK_DIR_PATH = apiConfig.MOCK_DIR_PATH || `${process.cwd()}/mock/`;
+const { NEI_SERVER = 'https://nei.netease.com' } = apiConfig;
 let mock = {};
 // mock列表索引
 let mockIndex = 0;
@@ -16,7 +18,7 @@ let mockArr = [];
  * @returns 
  */
 mock.getMockData = async (url) => {
-    const newUrl = `${apiConfig.NEI_SERVER}/api/apimock-v2/${apiConfig.PROJECT_KEY}/${url}`;
+    const newUrl = `${NEI_SERVER}/api/apimock-v2/${apiConfig.PROJECT_KEY}/${url}`;
     var options = {
         method: 'POST',
         url: newUrl,
@@ -52,7 +54,7 @@ mock.build = (dir, data) => {
 mock.buildOne = async function (data) {
     let urlArr = util.cleanEmptyInArray(data.path.split('/'));
     const API_URL = `${urlArr.join('/')}`;
-    let apiPath = apiConfig.MOCK_DIR_PATH;
+    let apiPath = MOCK_DIR_PATH;
     let API_NAME = urlArr[urlArr.length - 1];
     // 命名mock文件名称
     let mockFileName = `${urlArr[urlArr.length - 1] || 'other'}.json`;
@@ -97,29 +99,10 @@ mock.buildNext = function () {
  * 获取Mock数据
  */
 mock.getMock = async function () {
-    const { TYPE, API_FILE_PATH, NEI_SERVER, NEI_PID, PRIVATE_TOKEN } = apiConfig;
-    let apiJson = {}
-    if (TYPE === 1) {
-        if (fs.existsSync(API_FILE_PATH)) {
-            apiJson = require(API_FILE_PATH);
-        } else {
-            log.error('api.json文件不存在');
-        }
+    const apiJson = await util.getApiData();
+    if (apiJson) {
+        mock.build(MOCK_DIR_PATH, apiJson, true);
     }
-    if (TYPE === 2) {
-        var options = {
-            method: 'GET',
-            uri: `${NEI_SERVER}/openapi/interfaces?pid=${NEI_PID}&private_token=${PRIVATE_TOKEN}`,
-            json: true
-        };
-        try {
-            apiJson = await rp(options);
-        } catch (err) {
-            log.error(`接口请求失败：${err}`)
-        }
-    }
-    mock.build(apiConfig.MOCK_DIR_PATH, apiJson, true);
 }
-
 
 module.exports.mock = mock;

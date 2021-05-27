@@ -14,7 +14,7 @@ const pkg = require("../package.json")
 
 program.version(pkg.version, '-v, --version', '版本号')
 program
-    .command('init')
+    .command('all')
     .description('同时生成api文件以及mock数据')
     .action(function () {
         api.getApiJson()

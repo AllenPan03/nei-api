@@ -1,5 +1,8 @@
 const fs = require('fs');
 const path = require("path");
+const apiConfig = require(path.resolve(process.cwd(), './nei.config'));
+const rp = require('request-promise');
+const log = require("./log.js");
 const util = {};
 /**
  * 清除一个数组中值为空的项
@@ -95,5 +98,40 @@ util.clean = function (dir) {
     util.rmdirSync(dir);
     fs.mkdirSync(dir);
 };
+/**
+ * 获取api数据
+ * @returns 
+ */
+util.getApiData = async function () {
+    const { TYPE = 2, API_FILE_PATH, NEI_SERVER = 'https://nei.netease.com', NEI_PID, PRIVATE_TOKEN } = apiConfig;
+    let apiJson = {}
+    if (TYPE === 1) {
+        if (fs.existsSync(API_FILE_PATH)) {
+            apiJson = require(API_FILE_PATH);
+        } else {
+            log.error('api.json文件不存在');
+        }
+    }
+    if (TYPE === 2) {
+        const url = `${NEI_SERVER}/openapi/interfaces?pid=${NEI_PID}&private_token=${PRIVATE_TOKEN}`;
+        const options = {
+            method: 'GET',
+            url,
+            json: true,
+            timeout: 2000
+        };
+        try {
+            apiJson = await rp(options);
+            if (apiJson.code !== 200) {
+                log.error(`接口${url}请求失败：${apiJson.msg}`)
+                return false;
+            }
+        } catch (err) {
+            log.error(`接口${url}请求失败：${err}`)
+            return false;
+        }
+    }
+    return apiJson;
+}
 
 module.exports = util;

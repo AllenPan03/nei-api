@@ -3,10 +3,12 @@ const path = require('path');
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
-const rp = require('request-promise');
 const log = require("./log.js");
 const util = require("./util");
-const apiConfig = require(path.resolve(process.cwd(), './nei.config'))
+const {
+  API_DIR_PATH = `${process.cwd()}/services/`,
+  TPL_API_PATH = path.resolve(__dirname, `../example/tpl/@api/module.js`)
+} = require(path.resolve(process.cwd(), './nei.config'));
 // api列表索引
 let apisIndex = 0;
 // api列表
@@ -44,7 +46,6 @@ api.build = (dir, data, override) => {
  * @param {Object} data 指定的一个api数据
  */
 api.buildOne = function (data) {
-  log.info(data);
   let urlArr = util.cleanEmptyInArray(data.path.split('/'));
   let apiPath = buildPath;
 
@@ -53,7 +54,7 @@ api.buildOne = function (data) {
   }
 
   let API_NAME = urlArr[urlArr.length - 1];
-  
+
   if (API_NAME === 'delete') {
     // delete不能作为函数方法名
     API_NAME = 'delete_1';
@@ -62,7 +63,7 @@ api.buildOne = function (data) {
   let API_URL = `"${urlArr.join('/')}"`;
   if (API_NAME.includes('{')) {
     API_NAME = API_NAME.replace('{', '').replace('}', '')
-    API_URL = API_URL.replace(/"/g, '`').replace(/{/g, '${params.')
+    API_URL = API_URL.replace(/"/g, '`').replace(/{/g, '${params.') //这里的params为模板设置的方法入参
   }
   const API_METHOD = data.method.toLowerCase();
   let API_DATA = 'data';
@@ -119,7 +120,7 @@ api.buildOne = function (data) {
   // 目标文件路径
   let targetApiFilePath = `${apiPath}${apiFileName}`;
   // 模板文件路径
-  let tplApiFilePath = apiConfig.TPL_API_PATH;
+  let tplApiFilePath = TPL_API_PATH;
   if (!fs.existsSync(tplApiFilePath)) {
     log.error("无法找到api模板，请确认配置的路径是否正确")
     return
@@ -208,32 +209,10 @@ api.buildNext = function () {
  * @param {*} path 本地路径/http地址
  */
 api.getApiJson = async function () {
-  const { TYPE, API_FILE_PATH, NEI_SERVER, NEI_PID, PRIVATE_TOKEN } = apiConfig;
-  let apiJson = {}
-  if (TYPE === 1) {
-    if (fs.existsSync(API_FILE_PATH)) {
-      apiJson = require(API_FILE_PATH);
-    } else {
-      log.error('api.json文件不存在');
-    }
+  const apiJson = await util.getApiData();
+  if (apiJson) {
+    api.build(API_DIR_PATH, apiJson, true);
   }
-  if (TYPE === 2) {
-    var options = {
-      method: 'GET',
-      uri: `${NEI_SERVER}/openapi/interfaces?pid=${NEI_PID}&private_token=${PRIVATE_TOKEN}`,
-      json: true
-    };
-    try {
-      apiJson = await rp(options);
-      if (apiJson.code !== 200) {
-        log.error(`接口请求失败：${apiJson.msg}`)
-        return;
-      }
-    } catch (err) {
-      log.error(`接口请求失败：${err}`)
-    }
-  }
-  api.build(apiConfig.API_DIR_PATH, apiJson, true);
 }
 module.exports.api = api;
 
