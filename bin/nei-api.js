@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 const path = require('path');
 const fs = require('fs');
-const log = require("./log.js");
+const log = require("../lib/log.js");
 if (fs.existsSync(path.resolve(process.cwd(), './nei.config.js'))) {
 } else {
     log.error("请确认当前目录下是否已配置<nei.config.js>文件\n详见文档：https://github.com/AllenPan03/nei-api")
     return;
 }
-const { mock } = require("./mock")
-const { api } = require("./api")
+const { mock } = require("../lib/mock")
+const { api } = require("../lib/api")
 const program = require('commander')
 const pkg = require("../package.json")
 
