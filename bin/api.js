@@ -33,7 +33,7 @@ api.build = (dir, data, override) => {
   buildPath = dir;
   // 如果覆盖，先清除源目录
   if (override) {
-    api.clean(dir);
+    util.clean(dir);
   }
   apisArr = data.result;
   api.buildOne(apisArr[apisIndex]);
@@ -199,22 +199,6 @@ api.buildNext = function () {
     api.buildOne(apisArr[apisIndex]);
   } else {
     log.info('api创建结束');
-  }
-};
-
-/**
- * 清除空api，fetch.js除外
- */
-api.clean = function (dir) {
-  let fetchContent = '';
-  if (fs.existsSync(`${dir}fetch.js`)) {
-    fetchContent = fs.readFileSync(`${dir}fetch.js`, 'utf-8');
-  }
-  util.rmdirSync(dir);
-  fs.mkdirSync(dir);
-
-  if (fetchContent) {
-    fs.writeFileSync(`${dir}fetch.js`, fetchContent, 'utf8');
   }
 };
 

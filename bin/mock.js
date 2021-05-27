@@ -11,15 +11,6 @@ let mockIndex = 0;
 let mockArr = [];
 
 /**
- * 清除空mock
- */
-mock.clean = function (dir) {
-    util.rmdirSync(dir);
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-};
-/**
  * 获取mock数据
  * @param {string} url 接口path地址
  * @returns 
@@ -48,7 +39,7 @@ mock.getMockData = async (url) => {
  */
 mock.build = (dir, data) => {
     if (fs.existsSync(dir)) {
-        mock.clean(dir);
+        util.clean(dir);
     }
     mockArr = data.result;
     mock.buildOne(mockArr[mockIndex]);

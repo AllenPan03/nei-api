@@ -87,4 +87,13 @@ util.dirListInDir = function (pattern) {
     return dirList;
 };
 
+/**
+ * 清空并新建指定目录文件
+ * @param {*} dir 
+ */
+util.clean = function (dir) {
+    util.rmdirSync(dir);
+    fs.mkdirSync(dir);
+};
+
 module.exports = util;
