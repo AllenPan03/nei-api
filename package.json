@@ -1,7 +1,7 @@
 {
   "name": "nei-api",
-  "version": "0.0.4",
-  "description": "Creates a rnpx application using the command line.",
+  "version": "0.0.5",
+  "description": "基于NEI生成前端所需要的接口文件和mock数据",
   "homepage": "https://github.com/AllenPan03/nei-api",
   "bugs": {
     "url": "https://github.com/AllenPan03/nei-api/issues"
@@ -12,8 +12,7 @@
   },
   "license": "MIT",
   "files": [
-    "cli.js",
-    "index.js",
+    "nei-api.js",
     "lib"
   ],
   "bin": {
@@ -31,6 +30,6 @@
   },
   "devDependencies": {},
   "authors": [
-    "panjunlin <panjunlin@gmail.com> (https://github.com/AllenPan03)"
+    "panjunlin <panjunlin@jinlins.com> (https://github.com/AllenPan03)"
   ]
 }

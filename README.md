@@ -48,8 +48,8 @@ module.exports = {
     NEI_PID: 123,
     // NEI访问令牌
     PRIVATE_TOKEN: 'xxxx',
-    // 项目的唯一标识 Key，在项目的设置中查看
-    PROJECT_KEY: 'xxxx'
+    // 项目组的唯一标识 Key，在项目组的设置中查看
+    PROGROUP_KEY: 'xxxx'
 }
 ```
 ### 配置参数说明
@@ -58,7 +58,7 @@ module.exports = {
 | :--- | :--- | :--- | :--- |
 | TYPE | Int | 是 | 获取json文件的方式 1-本地获取 2-http获 |
 | PRIVATE_TOKEN | String | 是 | NEI访问令牌 |
-| PROJECT_KEY | String | 是 | 项目的唯一标识 Key，在项目的设置中查看 |
+| PROGROUP_KEY | String | 是 | 项目的唯一标识 Key，在项目的设置中查看 |
 | REQUEST_PATH | String | 是 | 自定义request本地路径 |
 | NEI_PID | String | 是 | NEI项目ID |
 | API_FILE_PATH | String | 否 | api.json文件本地路径 |
