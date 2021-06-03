@@ -1,6 +1,6 @@
 {
   "name": "nei-api",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "基于NEI生成前端所需要的接口文件和mock数据",
   "homepage": "https://github.com/AllenPan03/nei-api",
   "bugs": {
