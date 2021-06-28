@@ -1,13 +1,10 @@
 #!/usr/bin/env node
-const path = require('path');
-const fs = require('fs');
-const log = require("../lib/log.js");
-if (!fs.existsSync(path.resolve(process.cwd(), './nei.config.js'))) {
-    log.error("请确认当前目录下是否已配置<nei.config.js>文件\n详见文档：https://github.com/AllenPan03/nei-api")
-    return;
+const util = require("../lib/util");
+let mock, api;
+if (util.isExists(false)) {
+    mock = require("../lib/mock")
+    api = require("../lib/api")
 }
-const { mock } = require("../lib/mock")
-const { api } = require("../lib/api")
 const program = require('commander')
 const pkg = require("../package.json")
 
@@ -16,20 +13,26 @@ program
     .command('all')
     .description('同时生成api文件以及mock数据')
     .action(function () {
-        api.getApiJson()
-        mock.getMock()
+        if (util.isExists(true)) {
+            api.getApiJson()
+            mock.getMock()
+        }
     });
 program
     .command('mock')
     .description('生成mock文件')
     .action(function () {
-        mock.getMock()
+        if (util.isExists(true)) {
+            mock.getMock()
+        }
     });
 program
     .command('api')
     .description('生成api文件')
     .action(function () {
-        api.getApiJson()
+        if (util.isExists(true)) {
+            api.getApiJson()
+        }
     });
 
 program.parse(process.argv)
