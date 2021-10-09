@@ -44,8 +44,8 @@ module.exports = {
     REQUEST_PATH: '@/utils/request/request',
     // NEI数据源服务器
     NEI_SERVER: 'https://nei.netease.com',
-    // NEI项目ID
-    NEI_PID: 123,
+    // NEI项目ID（支持多项目配置）
+    NEI_PID: "123,456",
     // NEI访问令牌
     PRIVATE_TOKEN: 'xxxx',
     // 项目组的唯一标识 Key，在项目组的设置中查看
